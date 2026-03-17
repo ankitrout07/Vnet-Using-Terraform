@@ -112,7 +112,7 @@ resource "azurerm_linux_virtual_machine" "bastion" {
   name                = "${var.project_name}-bastion"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
-  size                = "Standard_B1s"  # Changed to smaller size to fit quota
+  size                = "Standard_D2s_v3"
   admin_username      = var.admin_username
 
   network_interface_ids = [

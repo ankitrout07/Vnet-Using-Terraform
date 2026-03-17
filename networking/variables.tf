@@ -20,7 +20,7 @@ variable "project_name" {
 variable "vm_size" {
   description = "VM size for application servers"
   type        = string
-  default     = "Standard_B1s"  # Changed to smaller size to fit quota
+  default     = "Standard_D2s_v3"
 }
 
 variable "db_name" {
