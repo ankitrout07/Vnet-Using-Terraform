@@ -14,7 +14,19 @@ resource "azurerm_network_security_group" "alb_nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "80"
-    source_address_prefix      = "*"
+    source_address_prefix      = "112.196.74.82"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "Allow-SSH-Inbound"
+    priority                   = 110
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = var.ssh_allowed_source
     destination_address_prefix = "*"
   }
 }
