@@ -38,13 +38,13 @@ resource "azurerm_network_security_group" "app_nsg" {
   resource_group_name = azurerm_resource_group.main.name
 
   security_rule {
-    name                       = "Allow-HTTP-from-ALB"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "80"
+    name                   = "Allow-HTTP-from-ALB"
+    priority               = 100
+    direction              = "Inbound"
+    access                 = "Allow"
+    protocol               = "Tcp"
+    source_port_range      = "*"
+    destination_port_range = "80"
     # In a real setup, restrict to Application Gateway subnet or Load Balancer IPs
     source_address_prefix      = "VirtualNetwork"
     destination_address_prefix = "*"

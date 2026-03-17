@@ -10,7 +10,7 @@ terraform {
 }
 
 provider "azurerm" {
-  features {}O
+  features {}
 }
 
 variable "location" {
