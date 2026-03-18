@@ -83,7 +83,22 @@ resource "azurerm_network_security_group" "db_nsg" {
   }
 }
 
-# 4. Bastion Host Security Group (Public)
+# 4. Allow port 8080 (e.g., app running on 8080)
+resource "azurerm_network_security_rule" "allow_8080" {
+  name                        = "Allow-HTTP-8080"
+  priority                    = 120
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "8080"
+  source_address_prefix       = "*" # For production, replace with your specific Public IP
+  destination_address_prefix  = "*"
+  resource_group_name         = azurerm_resource_group.main.name
+  network_security_group_name = azurerm_network_security_group.app_nsg.name
+}
+
+# 5. Bastion Host Security Group (Public)
 resource "azurerm_network_security_group" "bastion_nsg" {
   name                = "${var.project_name}-bastion-nsg"
   location            = azurerm_resource_group.main.location
