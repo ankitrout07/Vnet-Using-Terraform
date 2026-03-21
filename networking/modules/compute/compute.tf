@@ -87,53 +87,6 @@ resource "azurerm_linux_virtual_machine_scale_set" "app" {
   custom_data = filebase64("${path.module}/init.sh")
 }
 
-# 3. Bastion Host (Public VM for SSH jump access to private tier)
-resource "azurerm_public_ip" "bastion_pip" {
-  name                = "${var.project_name}-bastion-pip"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  allocation_method   = "Static"
-  sku                 = "Standard"
-}
-
-resource "azurerm_network_interface" "bastion_nic" {
-  name                = "${var.project_name}-bastion-nic"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-
-  ip_configuration {
-    name                          = "internal"
-    subnet_id                     = var.public_subnet_ids[0]
-    private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.bastion_pip.id
-  }
-}
-
-resource "azurerm_linux_virtual_machine" "bastion" {
-  name                = "${var.project_name}-bastion"
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  size                = "Standard_D2s_v3" # Fits exactly into the remaining 2 cores of the 4-core quota
-  admin_username      = var.admin_username
-
-  network_interface_ids = [
-    azurerm_network_interface.bastion_nic.id,
-  ]
-
-  admin_ssh_key {
-    username   = var.admin_username
-    public_key = file("~/.ssh/id_rsa.pub")
-  }
-
-  os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
-  }
-
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts"
-    version   = "latest"
-  }
-}
+# Bastion Host removed:
+# Azure Student subscriptions have dynamically lowered their quota to EXACTLY 1 Public IP Address.
+# We must sacrifice the Bastion Host so that the App Load Balancer can claim the single IP for the web app!

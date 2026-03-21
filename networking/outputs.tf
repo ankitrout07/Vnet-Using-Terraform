@@ -8,10 +8,7 @@ output "lb_public_ip" {
   value       = module.compute.lb_public_ip
 }
 
-output "bastion_public_ip" {
-  description = "Public IP for SSH access: ssh adminuser@<bastion_public_ip>"
-  value       = module.compute.bastion_public_ip
-}
+
 
 output "db_server_fqdn" {
   description = "FQDN of the PostgreSQL Flexible Server (resolve inside VNet only)"
