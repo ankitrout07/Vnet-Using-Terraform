@@ -1,28 +1,7 @@
-# backend-init/main.tf
-terraform {
-  required_version = ">= 1.0"
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 3.0"
-    }
-  }
-}
-
-provider "azurerm" {
-  features {}
-}
-
-variable "location" {
-  default = "East US"
-}
-
-variable "resource_group_name" {
-  default = "rg-terraform-mgmt-prod"
-}
+# backend_storage.tf - Infrastructure for storing Terraform state.
 
 resource "azurerm_resource_group" "tfstate" {
-  name     = var.resource_group_name
+  name     = var.mgmt_resource_group_name
   location = var.location
 }
 

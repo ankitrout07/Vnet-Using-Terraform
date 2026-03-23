@@ -6,6 +6,12 @@ variable "location" {
   default     = "South India" # Switching to South India as Central India is completely out of quota
 }
 
+variable "mgmt_resource_group_name" {
+  description = "Name of the resource group for management/state resources"
+  type        = string
+  default     = "rg-terraform-mgmt-prod"
+}
+
 variable "vnet_address_space" {
   description = "Base Address Space for the VNet"
   type        = string
