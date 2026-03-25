@@ -73,11 +73,18 @@ resource "azurerm_role_assignment" "aks_acr_pull" {
 }
 
 # AGIC Role Assignments
-# The AGIC identity needs Contributor on the App Gateway and Network Contributor on the VNet
+# 1. Grant Reader to the Resource Group
+resource "azurerm_role_assignment" "agic_rg_reader" {
+  scope                = "/subscriptions/7ef42162-83d2-4247-8010-38bf34dd1453/resourceGroups/Fortress-VNet-rg"
+  role_definition_name = "Reader"
+  principal_id         = "36adc1ec-d3a2-4a48-a306-843725c42a6b" # Object ID from your logs
+}
+
+# 2. Grant Contributor to the App Gateway
 resource "azurerm_role_assignment" "agic_appgw_contributor" {
-  scope                = module.app_gateway.appgw_id
+  scope                = "/subscriptions/7ef42162-83d2-4247-8010-38bf34dd1453/resourceGroups/Fortress-VNet-rg/providers/Microsoft.Network/applicationGateways/Fortress-VNet-appgw"
   role_definition_name = "Contributor"
-  principal_id         = module.aks.principal_id # Using the cluster identity for simplicity, or specific if needed
+  principal_id         = "36adc1ec-d3a2-4a48-a306-843725c42a6b"
 }
 
 resource "azurerm_role_assignment" "agic_vnet_network_contributor" {
