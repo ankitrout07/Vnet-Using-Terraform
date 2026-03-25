@@ -94,3 +94,28 @@ resource "azurerm_role_assignment" "agic_vnet_network_contributor" {
   role_definition_name = "Network Contributor"
   principal_id         = module.aks.principal_id
 }
+
+# ── Docker Build & Push ────────────────────────────────────────────────────────
+resource "docker_image" "dashboard" {
+  name = "${module.acr.login_server}/fortress-dashboard:v2"
+  build {
+    context = "../dashboard"
+  }
+}
+
+resource "docker_registry_image" "dashboard" {
+  name          = docker_image.dashboard.name
+  keep_remotely = true
+}
+
+# ── Kubernetes Deployment ──────────────────────────────────────────────────────
+# Using kubernetes_manifest for flexibility (reads from your k8s/ directory)
+resource "kubernetes_manifest" "fortress_web" {
+  manifest = yamldecode(file("${path.module}/../k8s/fortress-app.yaml"))
+  depends_on = [docker_registry_image.dashboard, module.aks]
+}
+
+resource "kubernetes_manifest" "fortress_ingress" {
+  manifest = yamldecode(file("${path.module}/../k8s/fortress-ingress.yaml"))
+  depends_on = [kubernetes_manifest.fortress_web]
+}
