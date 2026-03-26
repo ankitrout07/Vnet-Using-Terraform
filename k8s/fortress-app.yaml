@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: fortress-dashboard
-          image: fortressvnetacr3x3rgz.azurecr.io/fortress-dashboard:v2
+          image: fortressvnet6aa4e1c7acrt6k0oi.azurecr.io/fortress-dashboard:v2
           ports:
             - containerPort: 80
           resources:
