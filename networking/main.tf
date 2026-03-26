@@ -17,7 +17,7 @@ module "networking" {
   ssh_allowed_source = var.ssh_allowed_source
 }
 
-# ── AKS module (Replaces VMSS) ──────────────────────────────────────────────────
+# ── AKS module ──────────────────────────────────────────────────
 module "aks" {
   source = "./modules/aks"
 
@@ -177,12 +177,10 @@ resource "kubernetes_service" "fortress_service" {
 resource "kubernetes_ingress_v1" "fortress_ingress" {
   metadata {
     name = "fortress-ingress-${random_id.suffix.hex}"
-    annotations = {
-      "kubernetes.io/ingress.class" = "azure/application-gateway"
-    }
   }
 
   spec {
+    ingress_class_name = "azure-application-gateway"
     rule {
       http {
         path {
