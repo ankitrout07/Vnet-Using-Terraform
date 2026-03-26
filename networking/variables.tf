@@ -35,6 +35,18 @@ variable "db_name" {
   default     = "fortressdb"
 }
 
+variable "min_count" {
+  description = "Minimum number of nodes in the AKS cluster"
+  type        = number
+  default     = 1
+}
+
+variable "max_count" {
+  description = "Maximum number of nodes in the AKS cluster (staying within quota 6)"
+  type        = number
+  default     = 3
+}
+
 variable "admin_username" {
   description = "Admin username for VMs and DB"
   type        = string

@@ -18,10 +18,12 @@ resource "azurerm_kubernetes_cluster" "main" {
   }
 
   default_node_pool {
-    name           = "systempool"
-    node_count     = var.node_count
-    vm_size        = var.node_vm_size
-    vnet_subnet_id = var.vnet_subnet_id
+    name                = "systempool"
+    vm_size             = var.node_vm_size
+    vnet_subnet_id      = var.vnet_subnet_id
+    enable_auto_scaling = true
+    min_count           = var.min_count
+    max_count           = var.max_count
     
     # Required for small clusters to fit in quota
     os_disk_size_gb = 32

@@ -28,6 +28,8 @@ module "aks" {
   vnet_subnet_id      = module.networking.app_subnet_ids[0]
   gateway_id          = module.app_gateway.appgw_id
   gateway_subnet_id   = module.networking.gateway_subnet_id
+  min_count           = var.min_count
+  max_count           = var.max_count
 }
 
 # ── Database module ────────────────────────────────────────────────────────────
@@ -150,6 +152,16 @@ resource "kubernetes_deployment" "fortress_web" {
           image = "${module.acr.login_server}/fortress-dashboard:v2"
           port {
             container_port = 80
+          }
+          resources {
+            requests = {
+              cpu    = "100m"
+              memory = "128Mi"
+            }
+            limits = {
+              cpu    = "250m"
+              memory = "256Mi"
+            }
           }
         }
       }

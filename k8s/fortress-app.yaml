@@ -12,10 +12,18 @@ spec:
       labels:
         app: fortress
     spec:
+      containers:
         - name: fortress-dashboard
           image: fortressvnetacr3x3rgz.azurecr.io/fortress-dashboard:v2
           ports:
             - containerPort: 80
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
 ---
 apiVersion: v1
 kind: Service

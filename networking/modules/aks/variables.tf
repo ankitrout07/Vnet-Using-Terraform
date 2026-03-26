@@ -33,6 +33,18 @@ variable "node_count" {
   default     = 1
 }
 
+variable "min_count" {
+  description = "Minimum number of nodes in the default node pool"
+  type        = number
+  default     = 1
+}
+
+variable "max_count" {
+  description = "Maximum number of nodes in the default node pool"
+  type        = number
+  default     = 3
+}
+
 variable "vnet_subnet_id" {
   description = "ID of the subnet where AKS nodes and pods will reside"
   type        = string
