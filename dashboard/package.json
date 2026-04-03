@@ -1,0 +1,14 @@
+{
+  "name": "fortress-dashboard-api",
+  "version": "1.0.0",
+  "description": "Dynamic Backend API and Static UI host for Fortress VNet",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "@kubernetes/client-node": "^0.20.0",
+    "cors": "^2.8.5"
+  }
+}
