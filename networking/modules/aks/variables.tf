@@ -59,3 +59,15 @@ variable "gateway_subnet_id" {
   description = "The ID of the subnet where the Application Gateway resides"
   type        = string
 }
+
+variable "authorized_ip_ranges" {
+  description = "List of authorized IP ranges to access the AKS API server"
+  type        = list(string)
+  default     = []
+}
+
+variable "environment" {
+  description = "The deployment environment (dev, prod, etc)"
+  type        = string
+  default     = "dev"
+}

@@ -12,9 +12,9 @@ resource "azurerm_kubernetes_cluster" "main" {
   resource_group_name     = var.resource_group_name
   dns_prefix              = "${lower(var.project_name)}-k8s"
   kubernetes_version      = var.kubernetes_version
-  private_cluster_enabled         = false # Private AKS Cluster
+  private_cluster_enabled = true # Private AKS Cluster
   api_server_access_profile {
-    authorized_ip_ranges = ["14.98.82.230/32"]
+    authorized_ip_ranges = var.authorized_ip_ranges
   }
 
   default_node_pool {
@@ -48,7 +48,7 @@ resource "azurerm_kubernetes_cluster" "main" {
   }
 
   tags = {
-    Environment = "Production"
+    Environment = var.environment
     Project     = var.project_name
   }
 }

@@ -71,3 +71,9 @@ variable "ssh_allowed_source" {
   type        = string
   default     = "*" # Restricted to user's IP in production
 }
+
+variable "aks_authorized_ip_ranges" {
+  description = "List of authorized IP ranges to access the AKS API server"
+  type        = list(string)
+  default     = []
+}

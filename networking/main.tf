@@ -28,8 +28,10 @@ module "aks" {
   vnet_subnet_id      = module.networking.app_subnet_ids[0]
   gateway_id          = module.app_gateway.appgw_id
   gateway_subnet_id   = module.networking.gateway_subnet_id
-  min_count           = var.min_count
-  max_count           = var.max_count
+  min_count            = var.min_count
+  max_count            = var.max_count
+  authorized_ip_ranges = var.aks_authorized_ip_ranges
+  environment          = var.environment
 }
 
 # ── Database module ────────────────────────────────────────────────────────────
