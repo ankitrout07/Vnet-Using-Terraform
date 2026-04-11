@@ -1,9 +1,5 @@
 # backend_storage.tf - Infrastructure for storing Terraform state.
 
-resource "azurerm_resource_group" "tfstate" {
-  name     = var.mgmt_resource_group_name
-  location = var.location
-}
 
 # Generate a random string for unique storage account name
 resource "random_string" "storage_account_name" {
@@ -14,8 +10,8 @@ resource "random_string" "storage_account_name" {
 
 resource "azurerm_storage_account" "tfstate" {
   name                     = "tfstate${random_string.storage_account_name.result}"
-  resource_group_name      = azurerm_resource_group.tfstate.name
-  location                 = azurerm_resource_group.tfstate.location
+  resource_group_name      = module.networking.resource_group_name
+  location                 = var.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
 }

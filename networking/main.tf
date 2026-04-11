@@ -75,6 +75,27 @@ module "acr" {
   resource_group_name = module.networking.resource_group_name
 }
 
+# ── Bastion module ─────────────────────────────────────────────────────────────
+module "bastion" {
+  source = "./modules/bastion"
+
+  project_name        = local.project_name_random
+  location            = var.location
+  resource_group_name = module.networking.resource_group_name
+  subnet_id           = module.networking.bastion_subnet_id
+}
+
+# ── Redis module ───────────────────────────────────────────────────────────────
+module "redis" {
+  source = "./modules/redis"
+
+  project_name        = local.project_name_random
+  location            = var.location
+  resource_group_name = module.networking.resource_group_name
+  subnet_id           = module.networking.redis_subnet_id
+  vnet_id             = module.networking.vnet_id
+}
+
 # Grant AKS pull permission from ACR
 resource "azurerm_role_assignment" "aks_acr_pull" {
   principal_id                     = module.aks.kubelet_identity_id

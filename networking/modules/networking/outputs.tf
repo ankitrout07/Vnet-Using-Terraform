@@ -41,3 +41,19 @@ output "resource_group_id" {
   description = "The ID of the shared resource group"
   value       = azurerm_resource_group.main.id
 }
+
+output "gateway_subnet_id" {
+  description = "ID of the gateway subnet"
+  value       = azurerm_subnet.gateway.id
+}
+
+output "bastion_subnet_id" {
+  description = "ID of the Bastion subnet"
+  value       = azurerm_subnet.bastion.id
+}
+
+output "redis_subnet_id" {
+  description = "ID of the Redis subnet"
+  value       = azurerm_subnet.redis.id
+}
+
