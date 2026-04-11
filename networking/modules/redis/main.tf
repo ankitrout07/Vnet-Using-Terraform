@@ -41,7 +41,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "redis_dns_link" {
 }
 
 resource "azurerm_private_dns_a_record" "redis_dns_a" {
-  name                = azurerm_redis_cache.redis.name
+  name                = lower(azurerm_redis_cache.redis.name)
   zone_name           = azurerm_private_dns_zone.redis_dns.name
   resource_group_name = var.resource_group_name
   ttl                 = 300

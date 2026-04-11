@@ -42,7 +42,7 @@ spec:
       serviceAccountName: fortress-dashboard-sa
       containers:
         - name: fortress-dashboard
-          image: fortressvnet6aa4e1c7acrt6k0oi.azurecr.io/fortress-dashboard:v2
+          image: fortressvnetdevb0d6a535acru9s3l6.azurecr.io/fortress-dashboard:v3
           ports:
             - containerPort: 80
           resources:
