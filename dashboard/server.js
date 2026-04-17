@@ -11,19 +11,27 @@ const kc = new k8s.KubeConfig();
 try {
   kc.loadFromCluster();
 } catch (e) {
-  console.log("Could not load in-cluster config, falling back to default.", e.message);
+  console.log("Could not load in-cluster config, falling back to local default.", e.message);
   try {
       kc.loadFromDefault();
   } catch (err) {
       console.log("Failed to load generic kubeconfig", err.message);
   }
 }
+
 const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
 
+// Enhanced Health Endpoint
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'Healthy', message: 'All core systems operational' });
+    res.json({ 
+        status: 'Healthy', 
+        message: 'All core systems operational',
+        uptime: process.uptime(),
+        platform: 'Azure AKS'
+    });
 });
 
+// Detailed Node Telemetry
 app.get('/api/nodes', async (req, res) => {
     try {
         const response = await k8sApi.listNode();
@@ -43,44 +51,65 @@ app.get('/api/nodes', async (req, res) => {
                 status: readyCondition ? (readyCondition.status === 'True' ? 'Ready' : 'NotReady') : 'Unknown',
                 cpuCapacity: cpuCap,
                 ramCapacity: ramGb > 0 ? `${ramGb}GB` : memoryCap,
-                // Simulate some varying usage percentage since metrics server API requires complex setup
-                cpuUsagePercent: Math.floor(Math.random() * (45 - 5 + 1) + 5),
-                ramUsageGb: (ramGb * (Math.random() * (0.8 - 0.2) + 0.2)).toFixed(1)
+                // Refined simulation for UI demonstration
+                cpuUsagePercent: Math.floor(Math.random() * (35 - 12 + 1) + 12),
+                ramUsageGb: (ramGb * (Math.random() * (0.6 - 0.3) + 0.3)).toFixed(1)
             };
         });
         res.json(nodes);
     } catch (error) {
         console.error('Error fetching nodes:', error.message);
-        res.status(500).json({ error: 'Failed to fetch nodes', details: error.message });
+        res.status(500).json({ error: 'Failed to fetch nodes' });
     }
 });
 
-app.get('/api/cluster-stats', async (req, res) => {
+// Pod Status Distribution for Charts
+app.get('/api/pod-stats', async (req, res) => {
     try {
         const response = await k8sApi.listPodForAllNamespaces();
-        const allPods = response.body.items;
+        const pods = response.body.items;
         
-        const runningPods = allPods.filter(p => p.status.phase === 'Running').length;
-        const totalPods = allPods.length;
+        const stats = {
+            Running: pods.filter(p => p.status.phase === 'Running').length,
+            Pending: pods.filter(p => p.status.phase === 'Pending').length,
+            Failed: pods.filter(p => p.status.phase === 'Failed').length,
+            Succeeded: pods.filter(p => p.status.phase === 'Succeeded').length
+        };
         
-        const fakeCpuPercent = Math.floor(Math.random() * (42 - 15 + 1) + 15);
+        res.json(stats);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed' });
+    }
+});
+
+// Detailed Cluster Stats & Events
+app.get('/api/cluster-stats', async (req, res) => {
+    try {
+        const podRes = await k8sApi.listPodForAllNamespaces();
+        const eventRes = await k8sApi.listEventForAllNamespaces();
+        
+        const allPods = podRes.body.items;
+        const events = eventRes.body.items
+            .sort((a, b) => new Date(b.lastTimestamp) - new Date(a.lastTimestamp))
+            .slice(0, 10)
+            .map(e => ({
+                time: new Date(e.lastTimestamp || e.firstTimestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second: '2-digit'}),
+                message: e.message,
+                type: e.type
+            }));
 
         res.json({
-            totalPods,
-            runningPods,
-            status: totalPods === runningPods ? 'Healthy' : 'Degraded',
-            estimatedCpuUsage: fakeCpuPercent,
-            latestEvent: {
-               time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-               message: `Auto-scaled to ${runningPods} pods`
-            }
+            totalPods: allPods.length,
+            runningPods: allPods.filter(p => p.status.phase === 'Running').length,
+            estimatedCpuUsage: Math.floor(Math.random() * (40 - 10 + 1) + 10),
+            events: events
         });
     } catch (error) {
          console.error('Error fetching cluster stats:', error.message);
-         res.status(500).json({ error: 'Failed to fetch cluster stats' });
+         res.status(500).json({ error: 'Failed' });
     }
 });
 
 app.listen(port, () => {
-  console.log(`Dynamic Dashboard API listening on port ${port}`);
+  console.log(`Fortress Cyber-Ops API listening on port ${port}`);
 });

@@ -30,10 +30,10 @@ docker-build:
 	@ACR=$$(cd $(TF_DIR) && terraform output -raw acr_login_server); \
 	ACR_NAME=$$(echo $$ACR | cut -d'.' -f1); \
 	az acr login --name $$ACR_NAME; \
-	docker build -t $$ACR/fortress-dashboard:v3 ./dashboard; \
-	docker push $$ACR/fortress-dashboard:v3; \
+	docker build -t $$ACR/fortress-dashboard:v4-cyber ./dashboard; \
+	docker push $$ACR/fortress-dashboard:v4-cyber; \
 	echo "==> Updating image URL in K8s manifest..."; \
-	sed -i "s|image: .*fortress-dashboard:.*|image: $$ACR/fortress-dashboard:v3|g" $(K8S_DIR)/fortress-app.yaml
+	sed -i "s|image: .*fortress-dashboard:.*|image: $$ACR/fortress-dashboard:v4-cyber|g" $(K8S_DIR)/fortress-app.yaml
 
 # 5. Deploy Soft Infrastructure (Kubernetes)
 k8s-deploy:

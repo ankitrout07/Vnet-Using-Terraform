@@ -3,245 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fortress VNet - Pro Dashboard</title>
+    <title>Fortress Cyber-Ops Hub</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="particles"></div>
-    <div class="bg-vignette"></div>
-    <div class="app-container">
+    <div class="cyber-bg"></div>
+    <div class="grid-overlay"></div>
+
+    <div class="app-shell">
         <!-- Sidebar -->
-        <nav class="sidebar">
-            <div class="logo">
-                <span class="logo-icon">🛡️</span>
-                <h2>Fortress</h2>
+        <aside class="sidebar">
+            <div class="logo-area">
+                <div class="logo-shield"></div>
+                <h1>FORTRESS</h1>
             </div>
-            <ul class="nav-links">
-                <li class="active" onclick="switchTab('overview')">
-                    <span class="icon">📊</span> Overview
-                </li>
-                <li onclick="switchTab('network')">
-                    <span class="icon">🕸️</span> Network
-                </li>
-                <li onclick="switchTab('nodes')">
-                    <span class="icon">🖥️</span> Nodes
-                </li>
-                <li onclick="switchTab('database')">
-                    <span class="icon">🗄️</span> Database
-                </li>
-                <li onclick="switchTab('events')">
-                    <span class="icon">📜</span> Events
-                </li>
-            </ul>
-            <div class="sidebar-footer">
-                <div class="clock" id="live-clock">00:00:00</div>
-                <div class="version">v2.0.0-PRO</div>
+            <nav class="nav-menu">
+                <li class="nav-item active" onclick="switchTab('overview')">📊 Overview</li>
+                <li class="nav-item" onclick="switchTab('telemetry')">📈 Telemetry</li>
+                <li class="nav-item" onclick="switchTab('nodes')">🖥️ Cluster Nodes</li>
+                <li class="nav-item" onclick="switchTab('topology')">🕸️ Network Map</li>
+            </nav>
+            <div style="padding: 2rem; border-top: 1px solid var(--glass-border);">
+                <div style="font-size: 1.2rem; font-weight: 700; color: #fff;" id="live-clock">00:00:00</div>
+                <div style="font-size: 0.6rem; color: var(--text-dim); margin-top: 0.5rem;">SECURE CONNECTION ACTIVE</div>
             </div>
-        </nav>
+        </aside>
 
         <!-- Main Content -->
-        <main class="main-content">
-            <header class="main-header">
-                <h1 id="tab-title">Infrastructure Overview</h1>
-                <div class="user-profile">
-                    <span class="status-indicator"></span> Cluster: Fortress-AKS
+        <main class="main-stage">
+            <header class="stage-header">
+                <h2 id="stage-title">System Overview</h2>
+                <div class="cluster-badge">
+                    <span class="status-dot"></span>
+                    AKS: Fortress-Primary
                 </div>
             </header>
 
-            <!-- Overview Section -->
-            <section id="overview" class="tab-content active">
-                <div class="dashboard-grid">
-                    <div class="card health">
-                        <div class="icon">🛡️</div>
-                        <h3>System Health</h3>
-                        <div class="status-badge pulse" id="health-badge">Loading...</div>
-                        <p id="health-text">Checking core systems...</p>
+            <!-- Overview Tab -->
+            <section id="overview" class="tab-pane active">
+                <div class="grid-system">
+                    <div class="cyber-card">
+                        <span class="label">System Health</span>
+                        <div class="value" id="val-health">Loading...</div>
+                        <div class="trend up">↑ Stable</div>
                     </div>
-                    <div class="card connectivity">
-                        <div class="icon">🌐</div>
-                        <h3>Connectivity</h3>
-                        <div class="status-badge">Private</div>
-                        <p>Secure VNet communication active</p>
+                    <div class="cyber-card">
+                        <span class="label">Active Pods</span>
+                        <div class="value" id="val-pods">0</div>
+                        <div class="trend">Live Metrics</div>
                     </div>
-                    <div class="card database">
-                        <div class="icon">🗄️</div>
-                        <h3>Database</h3>
-                        <div class="status-badge">Primary</div>
-                        <p>PostgreSQL cluster optimized</p>
+                    <div class="cyber-card">
+                        <span class="label">Traffic Ingress</span>
+                        <div class="value">94.2 Mb/s</div>
+                        <div class="trend up">↑ 4.2%</div>
                     </div>
-                    <div class="card gateway">
-                        <div class="icon">🚀</div>
-                        <h3>App Gateway</h3>
-                        <div class="status-badge">Online</div>
-                        <p>WAF protection enabled</p>
+                    <div class="cyber-card">
+                        <span class="label">WAF Status</span>
+                        <div class="value" style="color: var(--accent-teal);">Active</div>
+                        <div class="trend">Shield Enabled</div>
                     </div>
                 </div>
 
-                <div class="bottom-grid">
-                    <div class="panel events-panel">
-                        <h3>Recent Activity</h3>
-                        <ul class="event-list" id="event-list">
-                            <li><span class="time">10:45</span> Deployment successful: fortress-web:v2</li>
-                            <li><span class="time">09:30</span> AGIC Health Check: Passed</li>
-                            <li><span class="time">08:15</span> Database Backup completed</li>
-                        </ul>
-                    </div>
-                    <div class="panel metrics-panel">
-                        <h3>Quick Stats</h3>
-                        <div class="stat-item">
-                            <span>Ingress Traffic</span>
-                            <div class="progress-bar"><div class="fill" style="width: 65%;"></div></div>
+                <div class="telemetry-row">
+                    <div class="chart-panel">
+                        <h3>Real-time Cluster CPU (%)</h3>
+                        <div class="canvas-container">
+                            <canvas id="cpuChart"></canvas>
                         </div>
-                        <div class="stat-item">
-                            <span id="cpu-label">K8s CPU Usage</span>
-                            <div class="progress-bar"><div class="fill" id="cpu-fill" style="width: 0%;"></div></div>
+                    </div>
+                    <div class="terminal-panel">
+                        <div class="terminal-header">
+                            <div class="t-dot t-red"></div>
+                            <div class="t-dot t-yel"></div>
+                            <div class="t-dot t-gre"></div>
+                            <span style="font-size: 0.7rem; color: var(--text-dim); margin-left: auto;">K8S-EVENTS-LOG</span>
+                        </div>
+                        <div class="terminal-body" id="event-log">
+                            <div class="log-entry">> Initializing secure dashboard stream...</div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Network Section -->
-            <section id="network" class="tab-content">
-                <div class="topology-container">
-                    <h3>Network Topology</h3>
-                    <div class="topology-svg">
-                        <!-- SVG Topology -->
-                        <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
-                            <defs>
-                                <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" style="stop-color:#38bdf8;stop-opacity:0" />
-                                    <stop offset="50%" style="stop-color:#38bdf8;stop-opacity:1" />
-                                    <stop offset="100%" style="stop-color:#38bdf8;stop-opacity:0" />
-                                </linearGradient>
-                            </defs>
-                            <!-- Lines -->
-                            <path d="M 100 200 L 700 200" stroke="rgba(255,255,255,0.1)" stroke-width="2" fill="none" />
-                            <circle cx="100" cy="200" r="40" class="node-bg" />
-                            <text x="100" y="205" text-anchor="middle" fill="#fff" font-size="12">Internet</text>
-                            
-                            <line x1="140" y1="200" x2="260" y2="200" stroke="url(#lineGrad)" stroke-width="3">
-                                <animate attributeName="stroke-dasharray" from="0,500" to="500,0" dur="3s" repeatCount="indefinite" />
-                            </line>
-
-                            <rect x="260" y="160" width="80" height="80" rx="10" class="node-bg" />
-                            <text x="300" y="205" text-anchor="middle" fill="#fff" font-size="12">AppGW</text>
-
-                            <path d="M 340 200 L 460 100" stroke="rgba(255,255,255,0.2)" stroke-width="2" />
-                            <path d="M 340 200 L 460 300" stroke="rgba(255,255,255,0.2)" stroke-width="2" />
-
-                            <circle cx="500" cy="100" r="40" class="node-bg" />
-                            <text x="500" y="105" text-anchor="middle" fill="#fff" font-size="12">AKS</text>
-
-                            <circle cx="500" cy="300" r="40" class="node-bg" />
-                            <text x="500" y="305" text-anchor="middle" fill="#fff" font-size="12">DB</text>
-                        </svg>
+            <!-- Telemetry Tab -->
+            <section id="telemetry" class="tab-pane">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div class="chart-panel">
+                        <h3>Pod Distribution (Status)</h3>
+                        <div class="canvas-container" style="height: 300px;">
+                            <canvas id="podPieChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-panel">
+                        <h3>Memory Utilization (Trends)</h3>
+                        <div class="canvas-container" style="height: 300px;">
+                            <canvas id="memChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Nodes Section -->
-            <section id="nodes" class="tab-content">
-                <div class="nodes-grid" id="nodes-grid">
-                    <p style="color: rgba(255,255,255,0.6); grid-column: 1/-1; text-align:center; padding: 2rem;">Querying Kubernetes API for node telemetry...</p>
+            <!-- Nodes Tab -->
+            <section id="nodes" class="tab-pane">
+                <div class="nodes-container" id="nodes-grid">
+                    <!-- Nodes will be injected here -->
                 </div>
             </section>
 
-            <!-- Database Section -->
-            <section id="database" class="tab-content">
-                <div class="database-card card">
-                    <div class="db-header">
-                        <div class="icon">🗄️</div>
-                        <h3>PostgreSQL - FortressDB</h3>
-                        <div class="status-badge">Active</div>
-                    </div>
-                    <div class="db-details">
-                        <div class="stat-group">
-                            <label>Status</label>
-                            <span class="val">Running</span>
-                        </div>
-                        <div class="stat-group">
-                            <label>Connections</label>
-                            <span class="val">12 Active</span>
-                        </div>
-                        <div class="stat-group">
-                            <label>Storage Used</label>
-                            <span class="val">1.2 GB / 50 GB</span>
-                        </div>
-                    </div>
-                    <div class="db-metrics">
-                        <div class="metric">
-                            <label>Transactions / sec</label>
-                            <div class="mini-bar"><div class="fill" style="width: 45%;"></div></div>
-                        </div>
-                    </div>
+            <!-- Topology Tab -->
+            <section id="topology" class="tab-pane">
+                <div class="topology-stage">
+                    <svg viewBox="0 0 800 500" style="width:100%; height:100%;">
+                        <defs>
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="3.5" result="coloredBlur"/>
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                        </defs>
+                        <!-- Stylized Map -->
+                        <path d="M 100 250 Q 400 50 700 250 T 100 250" stroke="rgba(0, 242, 255, 0.1)" stroke-width="2" fill="none" />
+                        
+                        <g class="topology-node" transform="translate(100, 250)">
+                            <circle r="40" fill="rgba(0,0,0,0.8)" stroke="var(--accent-teal)" stroke-width="2" filter="url(#glow)" />
+                            <text dy="5" text-anchor="middle" fill="#fff" font-size="10">INTERNET</text>
+                        </g>
+
+                        <line x1="140" y1="250" x2="360" y2="250" stroke="var(--accent-teal)" stroke-width="2" stroke-dasharray="5 5">
+                            <animate attributeName="stroke-dashoffset" from="100" to="0" dur="5s" repeatCount="indefinite" />
+                        </line>
+
+                        <g class="topology-node" transform="translate(400, 250)">
+                            <rect x="-50" y="-40" width="100" height="80" rx="10" fill="rgba(0,0,0,0.8)" stroke="var(--accent-purple)" stroke-width="2" filter="url(#glow)" />
+                            <text dy="5" text-anchor="middle" fill="#fff" font-size="10">VNET-GATEWAY</text>
+                        </g>
+
+                        <g class="topology-node" transform="translate(680, 150)">
+                            <circle r="35" fill="rgba(0,0,0,0.8)" stroke="var(--success)" stroke-width="2" filter="url(#glow)" />
+                            <text dy="5" text-anchor="middle" fill="#fff" font-size="10">AKS-CLUSTER</text>
+                        </g>
+
+                        <g class="topology-node" transform="translate(680, 350)">
+                            <circle r="35" fill="rgba(0,0,0,0.8)" stroke="#ff9900" stroke-width="2" filter="url(#glow)" />
+                            <text dy="5" text-anchor="middle" fill="#fff" font-size="10">DATABASE</text>
+                        </g>
+                    </svg>
                 </div>
             </section>
         </main>
     </div>
 
     <script>
-        function updateClock() {
-            const now = new Date();
-            const time = now.toLocaleTimeString();
-            document.getElementById('live-clock').textContent = time;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
+        // Global State
+        let cpuChart, podPieChart, memChart;
+        const cpuData = Array(20).fill(0);
+        const memData = Array(20).fill(0);
+        const labels = Array(20).fill('');
 
+        // ── Tab Logic ──
         function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-links li').forEach(l => l.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             
             document.getElementById(tabId).classList.add('active');
             event.currentTarget.classList.add('active');
             
-            const titleMap = {
-                'overview': 'Infrastructure Overview',
-                'network': 'Network Topology',
-                'nodes': 'Cluster Nodes',
-                'database': 'Database Instance',
-                'events': 'Event Logs'
-            };
-            document.getElementById('tab-title').textContent = titleMap[tabId];
+            const titles = { overview: 'System Overview', telemetry: 'Cluster Telemetry', nodes: 'Compute Resources', topology: 'Network Topology' };
+            document.getElementById('stage-title').textContent = titles[tabId];
+            
+            if (tabId === 'telemetry') initCharts();
         }
 
-        async function fetchHealth() {
-            try {
-                const res = await fetch('/api/health');
-                const data = await res.json();
-                document.getElementById('health-badge').textContent = data.status;
-                document.getElementById('health-text').textContent = data.message;
-            } catch (e) {
-                document.getElementById('health-badge').textContent = 'Error';
-                document.getElementById('health-badge').classList.remove('pulse');
-                document.getElementById('health-badge').style.background = 'rgba(239,68,68,0.2)';
-                document.getElementById('health-badge').style.color = '#ef4444';
-            }
+        // ── Chart Logic ──
+        function initCharts() {
+            if (cpuChart) return; // Prevent double init
+            
+            const ctxCpu = document.getElementById('cpuChart').getContext('2d');
+            cpuChart = new Chart(ctxCpu, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Cluster CPU %',
+                        data: cpuData,
+                        borderColor: '#00f2ff',
+                        backgroundColor: 'rgba(0, 242, 255, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointRadius: 0
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { display: false } }, plugins: { legend: { display: false } } }
+            });
+
+            const ctxPie = document.getElementById('podPieChart').getContext('2d');
+            podPieChart = new Chart(ctxPie, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Running', 'Pending', 'Failed'],
+                    datasets: [{ data: [0, 0, 0], backgroundColor: ['#00ffaa', '#ffbd2e', '#ff0055'], borderWidth: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } } }
+            });
         }
 
-        async function fetchClusterStats() {
+        // ── Data Fetching ──
+        async function updateStats() {
             try {
                 const res = await fetch('/api/cluster-stats');
                 const data = await res.json();
-                document.getElementById('cpu-label').textContent = `K8s Estimated CPU (${data.estimatedCpuUsage}%)`;
-                document.getElementById('cpu-fill').style.width = data.estimatedCpuUsage + '%';
                 
-                if (data.latestEvent) {
-                    const el = document.getElementById('event-list');
-                    let add = true;
-                    if (el.firstElementChild && el.firstElementChild.innerText.includes(data.latestEvent.time)) add = false;
-                    
-                    if (add) {
-                        const newLi = document.createElement('li');
-                        newLi.innerHTML = `<span class="time">${data.latestEvent.time}</span> ${data.latestEvent.message}`;
-                        if (el.children.length >= 4) el.removeChild(el.lastElementChild);
-                        el.prepend(newLi);
+                document.getElementById('val-health').textContent = 'OPTIMAL';
+                document.getElementById('val-pods').textContent = data.totalPods;
+                
+                // Update CPU Chart
+                cpuData.shift();
+                cpuData.push(data.estimatedCpuUsage);
+                if (cpuChart) cpuChart.update();
+
+                // Update Terminal
+                const terminal = document.getElementById('event-log');
+                data.events.forEach(evt => {
+                    if (!terminal.innerText.includes(evt.message.substring(0,20))) {
+                        const entry = document.createElement('div');
+                        entry.className = 'log-entry';
+                        entry.innerHTML = `<span class="log-time">[${evt.time}]</span> <span class="log-msg">${evt.message}</span>`;
+                        terminal.prepend(entry);
+                        if (terminal.children.length > 30) terminal.removeChild(terminal.lastElementChild);
                     }
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        async function updatePodPie() {
+            try {
+                const res = await fetch('/api/pod-stats');
+                const data = await res.json();
+                if (podPieChart) {
+                    podPieChart.data.datasets[0].data = [data.Running, data.Pending, data.Failed];
+                    podPieChart.update();
                 }
-            } catch (e) {
-                console.error(e);
-            }
+            } catch (e) {}
         }
 
         async function fetchNodes() {
@@ -252,33 +258,38 @@
                 grid.innerHTML = '';
                 
                 nodes.forEach(node => {
-                    const isReady = node.status === 'Ready';
-                    const colorClass = isReady ? 'green' : 'red';
-                    const textClass = isReady ? 'text-success' : 'text-danger';
-                    
                     const card = document.createElement('div');
                     card.className = 'node-card';
                     card.innerHTML = `
-                        <div class="node-header">
-                           <h4>${node.name}</h4>
-                           <span class="dot ${colorClass}"></span>
+                        <div class="node-card-header">
+                            <div>
+                                <div class="node-name">${node.name}</div>
+                                <div style="font-size: 0.7rem; color: var(--text-dim);">${node.cpuCapacity} vCPU | ${node.ramCapacity} RAM</div>
+                            </div>
+                            <span class="status-dot"></span>
                         </div>
-                        <p>Status: <span class="${textClass}">${node.status}</span></p>
-                        <div class="mini-stat">CPU Usage: ~${node.cpuUsagePercent}% of ${node.cpuCapacity}</div>
-                        <div class="mini-stat">RAM Usage: ~${node.ramUsageGb}GB / ${node.ramCapacity}</div>
+                        <div style="font-size: 0.8rem; margin-bottom: 0.5rem;">CPU Utilization: ${node.cpuUsagePercent}%</div>
+                        <div class="resource-bar"><div class="resource-fill" style="width: ${node.cpuUsagePercent}%"></div></div>
                     `;
                     grid.appendChild(card);
                 });
-            } catch (e) {
-                document.getElementById('nodes-grid').innerHTML = '<p style="color:#ef4444; padding: 2rem;">Failed to fetch nodes from K8s API.</p>';
-            }
+            } catch (e) {}
         }
 
-        fetchHealth();
-        fetchClusterStats();
-        fetchNodes();
-        setInterval(fetchClusterStats, 10000);
+        // ── Utility ──
+        function updateClock() { document.getElementById('live-clock').textContent = new Date().toLocaleTimeString(); }
+
+        // Start Intervals
+        setInterval(updateClock, 1000);
+        setInterval(updateStats, 3000);
+        setInterval(updatePodPie, 10000);
         setInterval(fetchNodes, 15000);
+
+        // Initial Calls
+        updateClock();
+        updateStats();
+        fetchNodes();
+        initCharts(); // Ensure overview chart is ready
     </script>
 </body>
 </html>
