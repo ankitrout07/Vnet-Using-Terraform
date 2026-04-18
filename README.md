@@ -74,13 +74,15 @@ Internet
 │       └── bastion/       # Azure Bastion Host
 ├── .github/workflows/
 │   └── deploy.yml         # CI/CD: plan on PR, apply on merge to main
-├── HOW_TO_RUN.md          # Full deployment guide (start here)
+├── docs/                  # Documentation
+│   ├── ARCHITECTURE.md    # Detailed component breakdown
+│   └── HOW_TO_RUN.md      # Full deployment guide (start here)
 └── README.md              # This file
 ```
 
 ## Quick Start
 
-See **[HOW_TO_RUN.md](./HOW_TO_RUN.md)** for the full step-by-step guide including CI/CD setup.
+See **[HOW_TO_RUN.md](./docs/HOW_TO_RUN.md)** for the full step-by-step guide including CI/CD setup.
 
 ```bash
 # 1. Bootstrap remote backend

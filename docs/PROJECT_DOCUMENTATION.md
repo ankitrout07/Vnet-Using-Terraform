@@ -101,7 +101,7 @@ If the dashboard code changes, follow these steps:
 
 ## 5. Status and Verification
 
-- **Dashboard URL**: `http://20.204.41.105`
-- **Backend Health**: All 2 replicas are "Ready" and joined to the Application Gateway's backend pool.
+- **Dashboard URL**: `http://<app_gateway_public_ip>`
+- **Backend Health**: All replicas are "Ready" and joined to the Application Gateway's backend pool.
 - **Database**: Reachable only from within the VNet via its private FQDN.
 - **ACR**: Fully integrated with AKS for secure ImagePull.

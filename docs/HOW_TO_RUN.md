@@ -51,11 +51,9 @@ This takes about **10–15 minutes** (AKS and Application Gateway deployment).
 ---
 
 ## Step 3 — Access the Dashboard
-Once the deployment finishes, the Application Gateway public IP will be displayed. Open your browser and navigate to:
-```
-http://<app_gateway_public_ip>
-```
-*(Note: It may take 5 minutes for the Gateway to finish its initial health checks).*
+
+- **Dashboard URL**: `http://<app_gateway_public_ip>`
+- **Backend Health**: All replicas are "Ready" and joined to the Application Gateway's backend pool.
 
 ---
 
@@ -64,8 +62,9 @@ http://<app_gateway_public_ip>
 When it finishes you'll see something like:
 ```
 aks_cluster_name      = "Fortress-VNet-aks"
-app_gateway_public_ip = "20.x.x.x"
+app_gateway_public_ip = "<app_gateway_public_ip>"
 acr_login_server      = "fortressvnetacrxxxx.azurecr.io"
+```
 
 ### Accessing the Web App
 Once you've deployed an ingress/service to AKS, you can reach it via:
@@ -99,13 +98,13 @@ Since we've replaced the default Nginx page with a custom dashboard, you need to
 **1. Build the Docker Image:**
 ```bash
 cd dashboard
-docker build -t fortressvnetacr3x3rgz.azurecr.io/fortress-dashboard:v2 .
+docker build -t <acr_login_server>/fortress-dashboard:v2 .
 ```
 
 **2. Push to ACR:**
 ```bash
 # Ensure you are logged in (from Step 4)
-docker push fortressvnetacr3x3rgz.azurecr.io/fortress-dashboard:v2
+docker push <acr_login_server>/fortress-dashboard:v2
 ```
 
 **3. Apply to Kubernetes:**
@@ -120,9 +119,23 @@ Open your browser and navigate to the `app_gateway_public_ip` (from Step 4 outpu
 
 ---
 
+## Windows Users 🪟
+
+This project uses a `Makefile` and bash-style commands which do not run natively in CMD or PowerShell.
+
+**Recommended Options:**
+1.  **WSL (Windows Subsystem for Linux)**: Install Ubuntu via WSL and run all commands there. This is the most reliable way.
+2.  **Git Bash**: You can run the `terraform` and `az` commands in Git Bash, but the `Makefile` may still fail without a version of `make` installed.
+3.  **PowerShell**: You can run Terraform manually, but you will need to replace bash variables (like `$(...)`) with PowerShell syntax.
+
+---
+
 ## Teardown — Delete Everything
 
-Type `yes` at each prompt.
+```bash
+cd networking
+terraform destroy -auto-approve
+```
 
 ---
 
