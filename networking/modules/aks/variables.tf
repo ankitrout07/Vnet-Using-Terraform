@@ -18,7 +18,7 @@ variable "location" {
 variable "kubernetes_version" {
   description = "Kubernetes version for the AKS cluster"
   type        = string
-  default     = "1.32.11"
+  default     = "1.29.9"
 }
 
 variable "node_vm_size" {
