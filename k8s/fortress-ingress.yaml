@@ -2,7 +2,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: fortress-ingress
-  annotations: {}
+  annotations:
+    appgw.ingress.kubernetes.io/backend-path-prefix: "/"
+    appgw.ingress.kubernetes.io/health-probe-path: "/health"
+    appgw.ingress.kubernetes.io/success-codes: "200-399"
 spec:
   ingressClassName: azure-application-gateway
   rules:

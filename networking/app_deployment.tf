@@ -58,6 +58,10 @@ resource "kubernetes_deployment" "fortress_web" {
     namespace = "default"
   }
 
+  depends_on = [
+    azurerm_role_assignment.aks_acr_pull
+  ]
+
   spec {
     replicas = 2
     selector {
@@ -156,7 +160,6 @@ resource "kubernetes_ingress_v1" "fortress_ingress" {
     name      = "fortress-ingress"
     namespace = "default"
     annotations = {
-      "kubernetes.io/ingress.class"                       = "azure/application-gateway"
       "appgw.ingress.kubernetes.io/backend-path-prefix"   = "/"
       "appgw.ingress.kubernetes.io/health-probe-path"     = "/health"
       "appgw.ingress.kubernetes.io/success-codes"         = "200-399"
@@ -165,6 +168,7 @@ resource "kubernetes_ingress_v1" "fortress_ingress" {
   }
 
   spec {
+    ingress_class_name = "azure-application-gateway"
 
     rule {
       http {
