@@ -120,9 +120,16 @@ resource "azurerm_role_assignment" "agic_appgw_contributor" {
   principal_id         = module.aks.ingress_identity_id
 }
 
-# 3. Grant Network Contributor to the Virtual Network (Required for AGIC Sync)
+# 3. Grant Network Contributor to the Virtual Network
 resource "azurerm_role_assignment" "agic_vnet_contributor" {
   scope                = module.networking.vnet_id
+  role_definition_name = "Network Contributor"
+  principal_id         = module.aks.ingress_identity_id
+}
+
+# 4. Grant Network Contributor to the Public IP (Required for binding listeners)
+resource "azurerm_role_assignment" "agic_pip_contributor" {
+  scope                = module.app_gateway.public_ip_id
   role_definition_name = "Network Contributor"
   principal_id         = module.aks.ingress_identity_id
 }

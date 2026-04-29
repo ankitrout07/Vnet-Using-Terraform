@@ -44,13 +44,8 @@ resource "azurerm_application_gateway" "main" {
   }
 
   frontend_port {
-    name = "${local.frontend_port_name}-80"
+    name = local.frontend_port_name
     port = 80
-  }
-
-  frontend_port {
-    name = "${local.frontend_port_name}-placeholder"
-    port = 8888
   }
 
   frontend_ip_configuration {
@@ -66,24 +61,35 @@ resource "azurerm_application_gateway" "main" {
     name                  = local.http_setting_name
     cookie_based_affinity = "Disabled"
     path                  = "/"
-    port                  = 80
-    protocol              = "Http"
-    request_timeout       = 60
+    port                                = 80
+    protocol                            = "Http"
+    request_timeout                     = 60
+    probe_name                          = "fortress-health-probe"
+    pick_host_name_from_backend_address = true
+  }
+
+  probe {
+    name                                = "fortress-health-probe"
+    protocol                            = "Http"
+    path                                = "/health"
+    interval                            = 30
+    timeout                             = 30
+    unhealthy_threshold                 = 3
+    pick_host_name_from_backend_http_settings = true
   }
 
   http_listener {
-    name                           = "${local.listener_name}-placeholder"
+    name                           = local.listener_name
     frontend_ip_configuration_name = local.frontend_ip_configuration_name
-    frontend_port_name             = "${local.frontend_port_name}-placeholder"
+    frontend_port_name             = local.frontend_port_name
     protocol                       = "Http"
   }
 
-  # This is a "Placeholder" rule that stays out of AGIC's way
   request_routing_rule {
-    name                       = "placeholder-rule"
-    priority                   = 1
+    name                       = local.request_routing_rule_name
+    priority                   = 10000
     rule_type                  = "Basic"
-    http_listener_name         = "${local.listener_name}-placeholder"
+    http_listener_name         = local.listener_name
     backend_address_pool_name  = local.backend_address_pool_name
     backend_http_settings_name = local.http_setting_name
   }

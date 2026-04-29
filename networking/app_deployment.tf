@@ -109,7 +109,7 @@ resource "kubernetes_deployment" "fortress_web" {
 
           readiness_probe {
             http_get {
-              path = "/api/health"
+              path = "/health"
               port = 80
             }
             initial_delay_seconds = 5
@@ -118,7 +118,7 @@ resource "kubernetes_deployment" "fortress_web" {
 
           liveness_probe {
             http_get {
-              path = "/api/health"
+              path = "/health"
               port = 80
             }
             initial_delay_seconds = 15
@@ -158,13 +158,13 @@ resource "kubernetes_ingress_v1" "fortress_ingress" {
     annotations = {
       "kubernetes.io/ingress.class"                       = "azure/application-gateway"
       "appgw.ingress.kubernetes.io/backend-path-prefix"   = "/"
-      "appgw.ingress.kubernetes.io/health-probe-path"     = "/"
+      "appgw.ingress.kubernetes.io/health-probe-path"     = "/health"
       "appgw.ingress.kubernetes.io/success-codes"         = "200-399"
+      "appgw.ingress.kubernetes.io/use-private-ip"        = "false"
     }
   }
 
   spec {
-    ingress_class_name = "azure-application-gateway"
 
     rule {
       http {

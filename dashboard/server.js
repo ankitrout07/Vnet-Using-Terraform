@@ -21,6 +21,10 @@ app.get('/', (req, res) => {
     res.status(200).send('Fortress Dashboard OK');
 });
 
+app.get('/health', (req, res) => {
+    res.status(200).send('Healthy');
+});
+
 const kc = new k8s.KubeConfig();
 try {
     kc.loadFromDefault();
