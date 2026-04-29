@@ -7,6 +7,9 @@ resource "docker_image" "dashboard" {
     context    = "../dashboard"
     dockerfile = "Dockerfile"
   }
+  triggers = {
+    dir_sha1 = sha1(join("", [for f in fileset("../dashboard", "*") : filesha1("../dashboard/${f}")]))
+  }
 }
 
 resource "docker_registry_image" "dashboard" {
