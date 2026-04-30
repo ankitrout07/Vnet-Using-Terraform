@@ -22,6 +22,9 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.5.0
+          # Disable the wrapper so terraform exit codes are not swallowed
+          # and ::debug:: annotations don't corrupt $GITHUB_ENV
+          terraform_wrapper: false
 
       - name: Terraform Init
         run: |
@@ -40,8 +43,14 @@ jobs:
       - name: Terraform Plan
         id: plan
         run: |
-          terraform plan -detailed-exitcode -out=tfplan || export EXIT_CODE=$?
-          echo "plan_status=$EXIT_CODE" >> $GITHUB_ENV
+          set +e
+          terraform plan -detailed-exitcode -out=tfplan
+          EXIT_CODE=$?
+          set -e
+          # 0 = no changes, 1 = error, 2 = changes present
+          echo "plan_status=${EXIT_CODE}" >> $GITHUB_ENV
+          # Propagate real errors (exit code 1) to fail the step
+          if [ $EXIT_CODE -eq 1 ]; then exit 1; fi
         working-directory: ./networking
         env:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
@@ -60,8 +69,13 @@ jobs:
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
 
       - name: Get Terraform Outputs
+        working-directory: ./networking
+        env:
+          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         run: |
-          cd ./networking
           echo "RG=$(terraform output -raw resource_group_name)" >> $GITHUB_ENV
           echo "AKS=$(terraform output -raw aks_cluster_name)" >> $GITHUB_ENV
           echo "ACR=$(terraform output -raw acr_login_server)" >> $GITHUB_ENV
