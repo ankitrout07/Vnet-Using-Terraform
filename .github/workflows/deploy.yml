@@ -78,7 +78,8 @@ jobs:
           docker push ${{ env.ACR }}/fortress-dashboard:latest
 
       - name: Update K8s Manifests
-        run: sed -i "s|image: .*|image: ${{ env.ACR }}/fortress-dashboard:latest|g" k8s/fortress-app.yaml
+        run: |
+          sed -i 's|image: .*|image: ${{ env.ACR }}/fortress-dashboard:latest|' k8s/fortress-app.yaml
 
       - name: Deploy App to AKS
         run: kubectl apply -f k8s/
