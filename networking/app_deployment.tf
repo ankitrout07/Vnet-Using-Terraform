@@ -57,7 +57,7 @@ resource "kubernetes_cluster_role_binding" "dashboard_rolebinding" {
 
 resource "kubernetes_deployment" "fortress_web" {
   metadata {
-    name      = "fortress-web"
+    name      = "fortress-dashboard-web"
     namespace = "default"
   }
 
@@ -77,6 +77,9 @@ resource "kubernetes_deployment" "fortress_web" {
       metadata {
         labels = {
           app = "fortress"
+        }
+        annotations = {
+          "build_hash" = sha1(join("", [for f in fileset("../dashboard", "*") : filesha1("../dashboard/${f}")]))
         }
       }
 

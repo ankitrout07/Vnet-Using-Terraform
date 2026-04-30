@@ -42,9 +42,9 @@ spec:
       serviceAccountName: fortress-dashboard-sa
       containers:
         - name: fortress-dashboard
-          image: fortressvnetdevb0d6a535acru9s3l6.azurecr.io/fortress-dashboard:v4-cyber
+          image: fortressvnetdevb0d6a535acru9s3l6.azurecr.io/fortress-dashboard:latest
           ports:
-            - containerPort: 80
+            - containerPort: 3000
           resources:
             requests:
               cpu: "100m"
@@ -63,5 +63,5 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 80
+      targetPort: 3000
   type: ClusterIP
