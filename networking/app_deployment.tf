@@ -12,10 +12,10 @@ resource "docker_image" "dashboard" {
   }
 }
 
-resource "docker_registry_image" "dashboard" {
-  name          = docker_image.dashboard.name
-  keep_remotely = true
-}
+# resource "docker_registry_image" "dashboard" {
+#   name          = docker_image.dashboard.name
+#   keep_remotely = true
+# }
 
 # 2. Kubernetes Resources
 resource "kubernetes_service_account" "dashboard_sa" {
@@ -84,7 +84,7 @@ resource "kubernetes_deployment" "fortress_web" {
         service_account_name = kubernetes_service_account.dashboard_sa.metadata[0].name
         container {
           name  = "fortress-dashboard"
-          image = docker_registry_image.dashboard.name
+          image = docker_image.dashboard.name
 
           port {
             container_port = 3000
