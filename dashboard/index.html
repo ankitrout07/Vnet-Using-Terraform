@@ -28,6 +28,7 @@
                 <li class="nav-item" onclick="switchTab('nodes')">🖥️ Cluster Nodes</li>
                 <li class="nav-item" onclick="switchTab('arch')">🏗️ Architecture</li>
                 <li class="nav-item" onclick="switchTab('security')">🛡️ Security Logs</li>
+                <li class="nav-item" onclick="switchTab('settings')">⚙️ Settings</li>
             </nav>
             <div class="sidebar-footer">
                 <div class="clock" id="live-clock">00:00:00</div>
@@ -443,6 +444,67 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Settings Tab -->
+            <section id="settings" class="tab-pane">
+                <div class="settings-container">
+                    <div class="settings-header">
+                        <h3>System Settings</h3>
+                        <p>Configure dashboard preferences and advanced operations</p>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <h4>UI Preferences</h4>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <strong>Animations</strong>
+                                <span>Enable rich data-flow animations</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-group advanced-group">
+                        <h4><span style="color:var(--danger)">⚠️</span> Advanced Operations (Admin)</h4>
+                        
+                        <!-- Manual Pod Scaling -->
+                        <div class="cyber-card" style="margin-top: 1rem">
+                            <div class="icon">📈</div>
+                            <h3>Manual Pod Scaling</h3>
+                            <p>Force scale the 'fortress-web' workload</p>
+                            <div class="input-group">
+                                <input type="number" id="scale-input" min="1" max="10" value="2" class="cyber-input">
+                                <button class="action-btn" onclick="triggerScale()">Scale Deployment</button>
+                            </div>
+                        </div>
+
+                        <!-- Live Traffic View -->
+                        <div class="cyber-card" style="margin-top: 1rem">
+                            <div class="icon">🌊</div>
+                            <h3>Live Ingress Traffic</h3>
+                            <p>Real-time edge traffic metrics</p>
+                            <div class="traffic-chart-container" style="height: 120px; display: flex; align-items: flex-end; gap: 4px; padding: 1rem; background: rgba(0,0,0,0.4); border-radius: 8px; overflow: hidden;" id="traffic-bars">
+                                <!-- Bars injected by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Database Record Entry -->
+                        <div class="cyber-card" style="margin-top: 1rem">
+                            <div class="icon">🗄️</div>
+                            <h3>Manual Database Entry</h3>
+                            <p>Inject records directly into Postgres backend</p>
+                            <div class="input-group">
+                                <input type="text" id="db-msg-input" placeholder="Enter log message..." class="cyber-input" style="flex:1">
+                                <button class="action-btn" onclick="triggerDBInsert()">Insert Record</button>
+                            </div>
+                            <div id="db-results" style="margin-top: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: #00f5d4;"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
@@ -515,7 +577,7 @@
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             event.currentTarget.classList.add('active');
-            const titles = { overview: 'Infrastructure Overview', network: 'Live Network Map', nodes: 'Compute Resources', arch: 'Architecture & Tech Stack', security: 'Security Logs' };
+            const titles = { overview: 'Infrastructure Overview', network: 'Live Network Map', nodes: 'Compute Resources', arch: 'Architecture & Tech Stack', security: 'Security Logs', settings: 'System Settings & Controls' };
             document.getElementById('stage-title').textContent = titles[tabId];
         }
 
@@ -763,6 +825,74 @@
 
         setInterval(fetchStats, 3000);
         fetchStats();
+
+        // Settings Features Logic
+        async function triggerScale() {
+            const replicas = document.getElementById('scale-input').value;
+            writeToTerminal(`Initiating scale operation to ${replicas} replicas...`, 'warn');
+            try {
+                const res = await fetch('/api/scale', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ deployment: 'fortress-web', replicas })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(`Scaled to ${replicas} pods`, 'success');
+                    writeToTerminal(`Scale successful: ${data.message}`, 'success');
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (err) {
+                showToast('Scale failed', 'danger');
+                writeToTerminal(`Scale Error: ${err.message}`, 'danger');
+            }
+        }
+
+        async function triggerDBInsert() {
+            const msg = document.getElementById('db-msg-input').value;
+            if (!msg) return;
+            writeToTerminal(`Connecting to Postgres database to insert record...`, 'info');
+            try {
+                const res = await fetch('/api/db/entry', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ message: msg })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Record Inserted', 'success');
+                    writeToTerminal('Postgres Insert Successful.', 'success');
+                    document.getElementById('db-results').innerHTML = `Last Insert: ID ${data.data.id} - "${data.data.message}" at ${new Date(data.data.created_at).toLocaleTimeString()}`;
+                    document.getElementById('db-msg-input').value = '';
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (err) {
+                showToast('DB Insert Failed', 'danger');
+                writeToTerminal(`DB Error: ${err.message}`, 'danger');
+                document.getElementById('db-results').innerHTML = `<span style="color:var(--danger)">Error: DB Variables not configured properly on pod.</span>`;
+            }
+        }
+
+        // Live Traffic Chart Logic
+        const trafficBars = document.getElementById('traffic-bars');
+        setInterval(() => {
+            if (document.getElementById('settings').classList.contains('active')) {
+                const rps = Math.floor(Math.random() * 500) + 1200; // Simulated
+                const height = (rps / 2000) * 100;
+                const bar = document.createElement('div');
+                bar.style.width = '20px';
+                bar.style.height = `${height}%`;
+                bar.style.background = `linear-gradient(to top, var(--accent-1), var(--accent-2))`;
+                bar.style.borderRadius = '4px 4px 0 0';
+                bar.style.transition = 'height 0.3s ease';
+                trafficBars.appendChild(bar);
+                if (trafficBars.children.length > 30) {
+                    trafficBars.removeChild(trafficBars.firstElementChild);
+                }
+            }
+        }, 1000);
     </script>
 </body>
 </html>

@@ -712,3 +712,31 @@ body.failed-gateway .node.gateway rect { stroke: var(--danger) !important; }
     background: var(--accent-teal); 
 }
 .tech-list strong { color: #fff; }
+
+/* ── Settings Tab ── */
+.settings-container { padding: 1rem 0; max-width: 800px; margin: 0 auto; }
+.settings-header { margin-bottom: 3rem; text-align: center; }
+.settings-header h3 { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; }
+.settings-header p { color: var(--text-dim); }
+
+.settings-group { margin-bottom: 2.5rem; }
+.settings-group h4 { font-size: 1.2rem; font-weight: 700; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.8rem; margin-bottom: 1.5rem; color: #fff; }
+
+.setting-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; background: var(--bg-panel); border: 1px solid var(--glass-border); border-radius: 12px; transition: 0.3s; }
+.setting-item:hover { border-color: rgba(6, 182, 212, 0.4); }
+.setting-info strong { display: block; font-size: 1rem; color: #fff; margin-bottom: 0.2rem; }
+.setting-info span { font-size: 0.85rem; color: var(--text-dim); }
+
+/* Toggle Switch */
+.toggle-switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); transition: .4s; border-radius: 34px; border: 1px solid var(--glass-border); }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 3px; background-color: #fff; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: var(--accent-teal); border-color: var(--accent-teal); box-shadow: 0 0 15px var(--accent-glow); }
+input:checked + .slider:before { transform: translateX(24px); }
+
+/* Advanced Inputs */
+.advanced-group h4 { color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
+.input-group { display: flex; gap: 1rem; margin-top: 1rem; }
+.cyber-input { background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); padding: 0.8rem 1rem; border-radius: 8px; color: #fff; font-family: 'JetBrains Mono', monospace; outline: none; transition: 0.3s; }
+.cyber-input:focus { border-color: var(--accent-teal); box-shadow: 0 0 10px rgba(6, 182, 212, 0.2); }

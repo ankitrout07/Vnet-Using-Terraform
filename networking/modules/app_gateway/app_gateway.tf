@@ -94,6 +94,16 @@ resource "azurerm_application_gateway" "main" {
     backend_http_settings_name = local.http_setting_name
   }
 
+  lifecycle {
+    ignore_changes = [
+      backend_address_pool,
+      backend_http_settings,
+      request_routing_rule,
+      probe,
+      tags
+    ]
+  }
+
   tags = {
     Environment = "Production"
     Project     = var.project_name

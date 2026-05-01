@@ -12,6 +12,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: Start Docker Build in Background
+        run: |
+          docker build -t local/fortress-dashboard:${{ github.sha }} ./dashboard > build.log 2>&1 &
+          echo "BUILD_PID=$!" >> $GITHUB_ENV
+
       # Explicit mapping to resolve "Not all values are present" error
       - name: Azure Login
         uses: azure/login@v2
@@ -80,10 +85,17 @@ jobs:
           echo "AKS=$(terraform output -raw aks_cluster_name)" >> $GITHUB_ENV
           echo "ACR=$(terraform output -raw acr_login_server)" >> $GITHUB_ENV
 
-      - name: Build and Push if Needed
+      - name: Wait for Docker Build and Push
         run: |
+          echo "Waiting for Docker build to finish..."
+          wait ${{ env.BUILD_PID }}
+          if [ $? -ne 0 ]; then
+            echo "Docker build failed!"
+            cat build.log
+            exit 1
+          fi
           ACR_NAME=${{ env.ACR }}
-          docker build -t $ACR_NAME/fortress-dashboard:${{ github.sha }} ./dashboard
+          docker tag local/fortress-dashboard:${{ github.sha }} $ACR_NAME/fortress-dashboard:${{ github.sha }}
           az acr login --name $(echo $ACR_NAME | cut -d. -f1)
           docker push $ACR_NAME/fortress-dashboard:${{ github.sha }}
 

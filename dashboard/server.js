@@ -3,7 +3,10 @@ const path = require('path');
 const http = require('http');
 const socketIo = require('socket.io');
 const k8s = require('@kubernetes/client-node');
+const { Pool } = require('pg');
 
+// Initialize Postgres Pool (will use PGHOST, PGUSER, PGPASSWORD, PGDATABASE env vars)
+const pool = new Pool();
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
@@ -12,9 +15,10 @@ const io = socketIo(server, {
         methods: ["GET", "POST"]
     }
 });
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname)));
+app.use(express.json());
 
 // Root health check for App Gateway default probes
 app.get('/', (req, res) => {
@@ -37,6 +41,7 @@ try {
 }
 
 const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
+const k8sAppsApi = kc.makeApiClient(k8s.AppsV1Api);
 
 // Health Endpoint
 app.get('/api/health', (req, res) => {
@@ -45,6 +50,43 @@ app.get('/api/health', (req, res) => {
         uptime: process.uptime(),
         platform: 'Azure AKS'
     });
+});
+
+// Scale Endpoint
+app.post('/api/scale', async (req, res) => {
+    try {
+        const { deployment, replicas } = req.body;
+        const namespace = 'default';
+        const patch = [
+            {
+                op: 'replace',
+                path: '/spec/replicas',
+                value: parseInt(replicas, 10)
+            }
+        ];
+        const options = { headers: { 'Content-type': k8s.PatchUtils.PATCH_FORMAT_JSON_PATCH } };
+        await k8sAppsApi.patchNamespacedDeployment(deployment, namespace, patch, undefined, undefined, undefined, undefined, undefined, options);
+        res.json({ success: true, message: `Scaled ${deployment} to ${replicas} replicas.` });
+    } catch (err) {
+        console.error('Scaling error:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Database Entry Endpoint
+app.post('/api/db/entry', async (req, res) => {
+    try {
+        const { message } = req.body;
+        // Create table if not exists
+        await pool.query('CREATE TABLE IF NOT EXISTS dashboard_logs (id SERIAL PRIMARY KEY, message TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)');
+        
+        // Insert record
+        const result = await pool.query('INSERT INTO dashboard_logs (message) VALUES ($1) RETURNING *', [message]);
+        res.json({ success: true, data: result.rows[0] });
+    } catch (err) {
+        console.error('DB error:', err);
+        res.status(500).json({ success: false, error: 'Database connection failed. Ensure PG variables are set.' });
+    }
 });
 
 async function getClusterData() {
