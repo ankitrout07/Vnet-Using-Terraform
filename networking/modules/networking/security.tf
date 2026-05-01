@@ -6,10 +6,35 @@ resource "azurerm_network_security_group" "unified_nsg" {
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
-  # 1. Web Traffic (ALB / Gateway / App)
+  # 1. Mandatory Gateway Infrastructure (Highest Priority for v2 SKU)
+  security_rule {
+    name                       = "Allow-GatewayManager-Inbound"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "65200-65535"
+    source_address_prefix      = "GatewayManager"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "Allow-AzureLoadBalancer-Inbound"
+    priority                   = 110
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "AzureLoadBalancer"
+    destination_address_prefix = "*"
+  }
+
+  # 2. Web Traffic (ALB / Gateway / App)
   security_rule {
     name                       = "Allow-HTTP-Inbound"
-    priority                   = 100
+    priority                   = 120
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
@@ -21,7 +46,7 @@ resource "azurerm_network_security_group" "unified_nsg" {
 
   security_rule {
     name                       = "Allow-HTTPS-Inbound"
-    priority                   = 110
+    priority                   = 130
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
@@ -31,10 +56,10 @@ resource "azurerm_network_security_group" "unified_nsg" {
     destination_address_prefix = "*"
   }
 
-  # 2. Management (Bastion / SSH)
+  # 3. Management (Bastion / SSH)
   security_rule {
     name                       = "Allow-SSH-External"
-    priority                   = 120
+    priority                   = 140
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
@@ -46,7 +71,7 @@ resource "azurerm_network_security_group" "unified_nsg" {
 
   security_rule {
     name                       = "Allow-SSH-Internal"
-    priority                   = 130
+    priority                   = 150
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
@@ -56,23 +81,10 @@ resource "azurerm_network_security_group" "unified_nsg" {
     destination_address_prefix = "*"
   }
 
-  # 3. Gateway Infrastructure
-  security_rule {
-    name                       = "Allow-GatewayManager-Inbound"
-    priority                   = 140
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "65200-65535"
-    source_address_prefix      = "GatewayManager"
-    destination_address_prefix = "*"
-  }
-
   # 4. Application Services
   security_rule {
     name                       = "Allow-App-Port-3000"
-    priority                   = 150
+    priority                   = 160
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
@@ -85,7 +97,7 @@ resource "azurerm_network_security_group" "unified_nsg" {
   # 5. Database Tier
   security_rule {
     name                       = "Allow-PostgreSQL-Inbound"
-    priority                   = 160
+    priority                   = 170
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
@@ -96,6 +108,18 @@ resource "azurerm_network_security_group" "unified_nsg" {
   }
 
   # 6. Global Security
+  security_rule {
+    name                       = "Allow-VNet-Inbound"
+    priority                   = 1000
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "VirtualNetwork"
+  }
+
   security_rule {
     name                       = "Deny-All-Inbound"
     priority                   = 4096
