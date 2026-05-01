@@ -10,31 +10,15 @@ output "vnet_id" {
   value       = azurerm_virtual_network.main.id
 }
 
-<<<<<<< HEAD
-output "public_subnet_ids" {
-  description = "IDs of the public (Tier 1) subnets"
-  value       = azurerm_subnet.public[*].id
-  depends_on  = [azurerm_subnet_network_security_group_association.unified]
-}
-
-=======
->>>>>>> abe2ea3 (Stable Update)
 output "app_subnet_ids" {
-  description = "IDs of the private app (Tier 2) subnets"
+  description = "IDs of the private app subnets"
   value       = azurerm_subnet.app[*].id
   depends_on  = [azurerm_subnet_network_security_group_association.unified]
 }
 
-<<<<<<< HEAD
-output "db_subnet_ids" {
-  description = "IDs of the isolated DB (Tier 3) subnets"
-  value       = azurerm_subnet.db[*].id
-  depends_on  = [azurerm_subnet_network_security_group_association.unified]
-=======
 output "db_delegated_subnet_id" {
   description = "ID of the delegated DB subnet for PostgreSQL"
   value       = azurerm_subnet.db_delegated.id
->>>>>>> abe2ea3 (Stable Update)
 }
 
 output "resource_group_name" {
@@ -67,10 +51,3 @@ output "redis_subnet_id" {
   description = "ID of the Redis subnet"
   value       = azurerm_subnet.redis.id
 }
-
-output "pg_delegated_subnet_id" {
-  description = "ID of the delegated subnet for PostgreSQL"
-  value       = azurerm_subnet.postgres_delegated.id
-  depends_on  = [azurerm_subnet_network_security_group_association.unified]
-}
-

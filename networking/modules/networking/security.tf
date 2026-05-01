@@ -137,42 +137,17 @@ resource "azurerm_network_security_group" "unified_nsg" {
 locals {
   # Define all subnets that should be associated with the unified NSG
   subnets_to_associate = merge(
-    { for i in range(2) : "public-${i}" => azurerm_subnet.public[i].id },
     { for i in range(2) : "app-${i}" => azurerm_subnet.app[i].id },
-    { for i in range(2) : "db-${i}" => azurerm_subnet.db[i].id },
+    { "db"      = azurerm_subnet.db_delegated.id },
     { "gateway" = azurerm_subnet.gateway.id },
-    { "redis"   = azurerm_subnet.redis.id },
-    { "pg"      = azurerm_subnet.postgres_delegated.id }
+    { "redis"   = azurerm_subnet.redis.id }
     # Note: AzureBastionSubnet excluded from unified NSG as it requires 
     # very specific, mandatory rules for Azure Bastion Service compliance.
   )
 }
 
-<<<<<<< HEAD
 resource "azurerm_subnet_network_security_group_association" "unified" {
   for_each                  = local.subnets_to_associate
   subnet_id                 = each.value
   network_security_group_id = azurerm_network_security_group.unified_nsg.id
-=======
-# NSG Associations
-resource "azurerm_subnet_network_security_group_association" "app" {
-  count                     = 2
-  subnet_id                 = azurerm_subnet.app[count.index].id
-  network_security_group_id = azurerm_network_security_group.app_nsg.id
-}
-
-resource "azurerm_subnet_network_security_group_association" "db" {
-  subnet_id                 = azurerm_subnet.db_delegated.id
-  network_security_group_id = azurerm_network_security_group.db_nsg.id
-}
-
-resource "azurerm_subnet_network_security_group_association" "gateway" {
-  subnet_id                 = azurerm_subnet.gateway.id
-  network_security_group_id = azurerm_network_security_group.gateway_nsg.id
->>>>>>> abe2ea3 (Stable Update)
-}
-
-resource "azurerm_subnet_network_security_group_association" "redis" {
-  subnet_id                 = azurerm_subnet.redis.id
-  network_security_group_id = azurerm_network_security_group.db_nsg.id # Reuse DB/Private NSG logic or create specific if needed
 }

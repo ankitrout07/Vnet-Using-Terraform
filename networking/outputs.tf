@@ -38,7 +38,6 @@ output "state_container_name" {
   description = "The name of the Storage Container for Terraform state storage."
 }
 
-
 output "resource_group_name" {
   description = "The main resource group name"
   value       = module.networking.resource_group_name
@@ -59,26 +58,12 @@ output "db_server_id" {
   value       = module.database.db_server_id
 }
 
-<<<<<<< HEAD
-output "db_admin_username" {
-  description = "Administrator username for PostgreSQL"
-  value       = var.admin_username
-}
-
-output "db_password" {
-  description = "Administrator password for PostgreSQL"
-=======
 output "db_password" {
   description = "Administrator password for the database"
->>>>>>> abe2ea3 (Stable Update)
   value       = random_password.db_password.result
   sensitive   = true
 }
 
-<<<<<<< HEAD
-output "db_name" {
-  description = "Database Name"
-=======
 output "db_username" {
   description = "Administrator username for the database"
   value       = var.admin_username
@@ -86,6 +71,5 @@ output "db_username" {
 
 output "db_name" {
   description = "Name of the database"
->>>>>>> abe2ea3 (Stable Update)
   value       = var.db_name
 }
