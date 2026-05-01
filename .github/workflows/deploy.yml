@@ -30,15 +30,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-<<<<<<< HEAD
-      - name: Start Docker Build in Background
-        run: |
-          ( docker build -t local/fortress-dashboard:${{ github.sha }} ./dashboard > build.log 2>&1 ; echo $? > build.status ) &
-          echo "BUILD_PID=$!" >> $GITHUB_ENV
-
-      # Explicit mapping to resolve "Not all values are present" error
-=======
->>>>>>> abe2ea3 (Stable Update)
       - name: Azure Login
         uses: azure/login@v2
         with:
@@ -109,32 +100,6 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         run: |
-<<<<<<< HEAD
-          echo "RG=$(terraform output -raw resource_group_name)" >> $GITHUB_ENV
-          echo "AKS=$(terraform output -raw aks_cluster_name)" >> $GITHUB_ENV
-          echo "ACR=$(terraform output -raw acr_login_server)" >> $GITHUB_ENV
-          echo "APPGW_ID=$(terraform output -raw appgw_id)" >> $GITHUB_ENV
-          echo "AKS_ID=$(terraform output -raw aks_cluster_id)" >> $GITHUB_ENV
-          echo "DB_ID=$(terraform output -raw db_server_id)" >> $GITHUB_ENV
-          echo "DB_FQDN=$(terraform output -raw db_server_fqdn)" >> $GITHUB_ENV
-          echo "DB_USER=$(terraform output -raw db_admin_username)" >> $GITHUB_ENV
-          echo "DB_PASS=$(terraform output -raw db_password)" >> $GITHUB_ENV
-          echo "DB_NAME=$(terraform output -raw db_name)" >> $GITHUB_ENV
-
-      - name: Wait for Docker Build and Push
-        run: |
-          echo "Waiting for Docker build to finish..."
-          while kill -0 ${{ env.BUILD_PID }} 2>/dev/null; do sleep 5; done
-          if [ ! -f build.status ] || [ "$(cat build.status)" -ne 0 ]; then
-            echo "Docker build failed!"
-            cat build.log
-            exit 1
-          fi
-          ACR_NAME=${{ env.ACR }}
-          docker tag local/fortress-dashboard:${{ github.sha }} $ACR_NAME/fortress-dashboard:${{ github.sha }}
-          az acr login --name $(echo $ACR_NAME | cut -d. -f1)
-          docker push $ACR_NAME/fortress-dashboard:${{ github.sha }}
-=======
           echo "RG=$(terraform output -raw resource_group_name)" >> $GITHUB_OUTPUT
           echo "AKS=$(terraform output -raw aks_cluster_name)" >> $GITHUB_OUTPUT
           echo "ACR=$(terraform output -raw acr_login_server)" >> $GITHUB_OUTPUT
@@ -153,7 +118,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
->>>>>>> abe2ea3 (Stable Update)
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -165,19 +129,6 @@ jobs:
 
       - name: Login to ACR
         run: |
-<<<<<<< HEAD
-          az aks get-credentials --resource-group ${{ env.RG }} --name ${{ env.AKS }} --overwrite-existing
-          sed -i 's|image: .*|image: ${{ env.ACR }}/fortress-dashboard:${{ github.sha }}|' k8s/fortress-app.yaml
-          sed -i "s|APPGW_ID_PLACEHOLDER|${{ env.APPGW_ID }}|" k8s/fortress-app.yaml
-          sed -i "s|AKS_ID_PLACEHOLDER|${{ env.AKS_ID }}|" k8s/fortress-app.yaml
-          sed -i "s|DB_ID_PLACEHOLDER|${{ env.DB_ID }}|" k8s/fortress-app.yaml
-          sed -i "s|DB_HOST_PLACEHOLDER|${{ env.DB_FQDN }}|" k8s/fortress-app.yaml
-          sed -i "s|DB_USER_PLACEHOLDER|${{ env.DB_USER }}|" k8s/fortress-app.yaml
-          sed -i "s|DB_PASSWORD_PLACEHOLDER|${{ env.DB_PASS }}|" k8s/fortress-app.yaml
-          sed -i "s|DB_NAME_PLACEHOLDER|${{ env.DB_NAME }}|" k8s/fortress-app.yaml
-          kubectl apply -f k8s/
-          kubectl rollout status deployment/fortress-web --timeout=600s
-=======
           az acr login --name $(echo ${{ needs.terraform.outputs.acr_server }} | cut -d. -f1)
 
       - name: Build and Push
@@ -208,17 +159,28 @@ jobs:
 
       - name: Deploy Manifests
         run: |
+          # Update Image
           sed -i 's|image: .*|image: ${{ needs.terraform.outputs.acr_server }}/fortress-dashboard:${{ github.sha }}|' k8s/fortress-app.yaml
+          
+          # Update Infrastructure IDs
           sed -i "s|APPGW_ID_PLACEHOLDER|${{ needs.terraform.outputs.appgw_id }}|" k8s/fortress-app.yaml
           sed -i "s|AKS_ID_PLACEHOLDER|${{ needs.terraform.outputs.aks_id }}|" k8s/fortress-app.yaml
           sed -i "s|DB_ID_PLACEHOLDER|${{ needs.terraform.outputs.db_id }}|" k8s/fortress-app.yaml
+          
+          # Update Database Connection (Unified)
           sed -i "s|PGHOST_PLACEHOLDER|${{ needs.terraform.outputs.db_host }}|" k8s/fortress-app.yaml
           sed -i "s|PGUSER_PLACEHOLDER|${{ needs.terraform.outputs.db_user }}|" k8s/fortress-app.yaml
           sed -i "s|PGPASSWORD_PLACEHOLDER|${{ needs.terraform.outputs.db_password }}|" k8s/fortress-app.yaml
           sed -i "s|PGDATABASE_PLACEHOLDER|${{ needs.terraform.outputs.db_name }}|" k8s/fortress-app.yaml
+          
+          # Also update the alternative placeholders just in case
+          sed -i "s|DB_HOST_PLACEHOLDER|${{ needs.terraform.outputs.db_host }}|" k8s/fortress-app.yaml
+          sed -i "s|DB_USER_PLACEHOLDER|${{ needs.terraform.outputs.db_user }}|" k8s/fortress-app.yaml
+          sed -i "s|DB_PASSWORD_PLACEHOLDER|${{ needs.terraform.outputs.db_password }}|" k8s/fortress-app.yaml
+          sed -i "s|DB_NAME_PLACEHOLDER|${{ needs.terraform.outputs.db_name }}|" k8s/fortress-app.yaml
+          
           kubectl apply -f k8s/
           kubectl rollout status deployment/fortress-dashboard-web --timeout=300s
->>>>>>> abe2ea3 (Stable Update)
 
       - name: Verify Deployment
         run: |

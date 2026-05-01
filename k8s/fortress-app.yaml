@@ -65,14 +65,6 @@ spec:
               value: "AKS_ID_PLACEHOLDER"
             - name: DB_ID
               value: "DB_ID_PLACEHOLDER"
-            - name: PGHOST
-              value: "DB_HOST_PLACEHOLDER"
-            - name: PGUSER
-              value: "DB_USER_PLACEHOLDER"
-            - name: PGPASSWORD
-              value: "DB_PASSWORD_PLACEHOLDER"
-            - name: PGDATABASE
-              value: "DB_NAME_PLACEHOLDER"
           resources:
             requests:
               cpu: "100m"
